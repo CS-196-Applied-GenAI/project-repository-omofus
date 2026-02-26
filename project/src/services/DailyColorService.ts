@@ -89,7 +89,7 @@ export class DailyColorService {
       [days]
     );
 
-    return result.rows.map((row) => this.mapRowToColor(row));
+    return result.rows.map((row: any) => this.mapRowToColor(row));
   }
 
   /**

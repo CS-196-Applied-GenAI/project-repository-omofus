@@ -1,3 +1,4 @@
+import { expect, describe, it } from '@jest/globals';
 import { colorDistance, isWithinTolerance } from '../src/utils/colorProcessing';
 import { RGB } from '../src/types';
 

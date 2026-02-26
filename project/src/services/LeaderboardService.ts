@@ -32,7 +32,7 @@ export class LeaderboardService {
       [limit, offset]
     );
 
-    const data = result.rows.map((row) => ({
+    const data = result.rows.map((row: any) => ({
       user_id: row.user_id,
       username: row.username,
       total_score: parseFloat(row.total_score || '0'),
@@ -87,7 +87,7 @@ export class LeaderboardService {
       [countryCode, limit, offset]
     );
 
-    const data = result.rows.map((row) => ({
+    const data = result.rows.map((row: any) => ({
       user_id: row.user_id,
       username: row.username,
       total_score: parseFloat(row.total_score || '0'),
@@ -183,7 +183,7 @@ export class LeaderboardService {
       [limit, offset]
     );
 
-    return result.rows.map((row) => ({
+    return result.rows.map((row: any) => ({
       find_id: row.find_id,
       user_id: row.user_id,
       username: row.username,

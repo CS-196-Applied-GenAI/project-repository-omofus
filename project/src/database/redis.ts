@@ -3,16 +3,18 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-let redisClient: ReturnType<typeof createClient>;
+let redisClient: ReturnType<typeof createClient> | null = null;
 
 export async function connectRedis() {
   try {
     redisClient = createClient({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
+      socket: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+      },
     });
 
-    redisClient.on('error', (err) => console.log('Redis Client Error', err));
+    redisClient.on('error', (err: any) => console.log('Redis Client Error', err));
     redisClient.on('connect', () => console.log('Redis client connected'));
 
     await redisClient.connect();
@@ -25,7 +27,7 @@ export async function connectRedis() {
 
 export function getRedisClient() {
   if (!redisClient) {
-    throw new Error('Redis client not initialized');
+    throw new Error('Redis client not initialized. Call connectRedis() first.');
   }
   return redisClient;
 }
@@ -37,4 +39,5 @@ export async function closeRedis(): Promise<void> {
   }
 }
 
+export { redisClient };
 export default redisClient;

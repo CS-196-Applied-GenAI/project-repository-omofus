@@ -49,7 +49,7 @@ export class FeedService {
       [dateStr, limit, offset]
     );
 
-    const data = result.rows.map((row) => ({
+    const data = result.rows.map((row: any) => ({
       find_id: row.find_id,
       image_url: row.image_url,
       score: parseFloat(row.score),
@@ -177,7 +177,7 @@ export class FeedService {
       [findId, userId]
     );
 
-    return result.rows.map((row) => row.reaction_type);
+    return result.rows.map((row: any) => row.reaction_type);
   }
 
   /**
