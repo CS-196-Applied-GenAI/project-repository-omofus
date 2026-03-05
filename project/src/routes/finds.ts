@@ -10,7 +10,7 @@ const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 /**
- * POST /finds
+ * POST /api/finds
  * Submit a find/image for the daily color
  * Body:
  *   - image: multipart/form-data file
@@ -33,6 +33,12 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
 
     const timezoneOffset = parseFloat(timezone_offset) || 0;
 
+    // Check attempt limit FIRST — before any expensive work
+    const canAttempt = await AttemptService.canMakeAttempt(user_id, timezoneOffset);
+    if (!canAttempt) {
+      return sendError(res, 'No attempts remaining for today', 429);
+    }
+
     // Get target color
     const targetColor = await DailyColorService.getColorForTimezone(timezoneOffset);
 
@@ -43,7 +49,8 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
       b: targetColor.blue,
     });
 
-    // Save submission
+    // Save submission (AttemptService handles incrementing the counter,
+    // S3 upload, geocoding, and DB insert)
     const imageKey = `finds/${user_id}/${targetColor.date.toISOString()}/${uuidv4()}.jpg`;
 
     const find = await AttemptService.saveFindSubmission(
@@ -59,6 +66,8 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
       timezoneOffset
     );
 
+    const attemptsRemaining = await AttemptService.getAttemptsRemaining(user_id, timezoneOffset);
+
     sendSuccess(
       res,
       {
@@ -67,6 +76,7 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
         pixel_count: find.pixel_count,
         neighborhood: find.neighborhood,
         attempt_number: find.attempt_number,
+        attempts_remaining: attemptsRemaining,
         image_url: find.image_url,
       },
       201
@@ -77,7 +87,7 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
 });
 
 /**
- * GET /finds/:findId
+ * GET /api/finds/:findId
  * Get details of a specific find
  */
 router.get('/:findId', async (req: Request, res: Response) => {
@@ -92,7 +102,7 @@ router.get('/:findId', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /finds/user/:userId
+ * GET /api/finds/user/:userId
  * Get all finds for a user
  */
 router.get('/user/:userId', async (req: Request, res: Response) => {

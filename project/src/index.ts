@@ -22,7 +22,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3001', 'http://localhost:3000'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

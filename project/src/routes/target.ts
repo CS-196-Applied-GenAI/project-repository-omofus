@@ -5,12 +5,12 @@ import { sendSuccess, sendError } from '../middleware/errorHandler';
 const router = Router();
 
 /**
- * GET /target
+ * GET /api/target
  * Get the daily color target for the user's timezone
  * Query params:
  *   - timezone_offset: hours offset from UTC (e.g., -8, 5.5)
  */
-router.get('/target', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const timezoneOffset = parseFloat(req.query.timezone_offset as string) || 0;
 
@@ -31,12 +31,12 @@ router.get('/target', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /target/history
+ * GET /api/target/history
  * Get color history for the last N days
  * Query params:
  *   - days: number of days to retrieve (default: 7)
  */
-router.get('/target/history', async (req: Request, res: Response) => {
+router.get('/history', async (req: Request, res: Response) => {
   try {
     const days = parseInt(req.query.days as string) || 7;
 
